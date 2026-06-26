@@ -36,6 +36,9 @@ namespace Murdoku
         private readonly List<GameObject> _cellButtons = new();
         private readonly List<GameObject> _suspectRows = new();
         private Font _font;
+        private MurdokuVisuals _visuals;
+
+        public void SetVisuals(MurdokuVisuals visuals) => _visuals = visuals;
 
         public void Build()
         {
@@ -240,9 +243,14 @@ namespace Murdoku
                     if (occupant != null)
                         color = Color.Lerp(color, Color.white, 0.35f);
 
-                    var label = BuildCellLabel(puzzle, cell, occupant, showSolution);
+                    var furnitureSprite = cell.Furniture != FurnitureType.Suelo
+                        ? _visuals?.GetFurnitureSprite(cell.Furniture)
+                        : null;
+                    var label = BuildCellLabel(puzzle, cell, occupant, showSolution, furnitureSprite != null);
                     var btn = CreateCellButton(_boardRoot, label, color, cellSize, puzzle.Size,
                         () => OnCellClicked?.Invoke(capturedPos));
+                    if (furnitureSprite != null)
+                        AddFurnitureIcon(btn.transform, furnitureSprite, cellSize);
                     _cellButtons.Add(btn);
                 }
             }
@@ -296,14 +304,30 @@ namespace Murdoku
             }
         }
 
-        private string BuildCellLabel(MurdokuPuzzle puzzle, MurdokuCell cell, MurdokuSuspect occupant, bool showSolution)
+        private void AddFurnitureIcon(Transform cellParent, Sprite sprite, float cellSize)
+        {
+            var iconGo = new GameObject("FurnitureIcon", typeof(RectTransform), typeof(Image));
+            iconGo.transform.SetParent(cellParent, false);
+            var rect = iconGo.GetComponent<RectTransform>();
+            var iconSize = cellSize * 0.55f;
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(iconSize, iconSize);
+            rect.anchoredPosition = new Vector2(0f, cellSize * 0.08f);
+            var img = iconGo.GetComponent<Image>();
+            img.sprite = sprite;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+        }
+
+        private string BuildCellLabel(MurdokuPuzzle puzzle, MurdokuCell cell, MurdokuSuspect occupant, bool showSolution, bool hasFurnitureSprite = false)
         {
             var room = RoomCatalog.RoomNames[cell.Room];
             var furniture = RoomCatalog.FurnitureLabels[cell.Furniture];
             var compact = puzzle.Size >= 6;
             var lines = compact ? Abbreviate(room) : room.ToUpperInvariant();
 
-            if (!string.IsNullOrEmpty(furniture))
+            if (!string.IsNullOrEmpty(furniture) && !hasFurnitureSprite)
                 lines += puzzle.Size >= 8 ? $"\n{Abbreviate(furniture)}" : $"\n{furniture}";
 
             if (occupant != null)
