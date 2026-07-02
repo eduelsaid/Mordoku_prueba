@@ -8,8 +8,6 @@ namespace Murdoku
         [SerializeField] private GameMode gameMode = GameMode.Facil;
         [SerializeField] private int randomSeed = -1;
 
-        [Header("Visuales")]
-        [SerializeField] private MurdokuVisuals visuals;
 
         private MurdokuPuzzle _puzzle;
         private MurdokuSuspect _selectedSuspect;
@@ -23,7 +21,7 @@ namespace Murdoku
         {
             SetupCamera();
             _ui = gameObject.AddComponent<MurdokuRuntimeUI>();
-            _ui.SetVisuals(visuals);
+            _ui.SetVisuals(Resources.Load<MurdokuVisuals>("MurdokuVisuals"));
             _ui.Build();
             WireUI();
             GenerateNewPuzzle();

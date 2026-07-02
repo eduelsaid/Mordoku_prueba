@@ -243,12 +243,15 @@ namespace Murdoku
                     if (occupant != null)
                         color = Color.Lerp(color, Color.white, 0.35f);
 
+                    var floorSprite = _visuals?.GetFurnitureSprite(FurnitureType.Suelo);
                     var furnitureSprite = cell.Furniture != FurnitureType.Suelo
                         ? _visuals?.GetFurnitureSprite(cell.Furniture)
                         : null;
                     var label = BuildCellLabel(puzzle, cell, occupant, showSolution, furnitureSprite != null);
                     var btn = CreateCellButton(_boardRoot, label, color, cellSize, puzzle.Size,
                         () => OnCellClicked?.Invoke(capturedPos));
+                    if (floorSprite != null)
+                        AddFloorSprite(btn.transform, floorSprite);
                     if (furnitureSprite != null)
                         AddFurnitureIcon(btn.transform, furnitureSprite, cellSize);
                     _cellButtons.Add(btn);
@@ -302,6 +305,21 @@ namespace Murdoku
 
                 _suspectRows.Add(row);
             }
+        }
+
+        private void AddFloorSprite(Transform cellParent, Sprite sprite)
+        {
+            var go = new GameObject("FloorSprite", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(cellParent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var img = go.GetComponent<Image>();
+            img.sprite = sprite;
+            img.preserveAspect = false;
+            img.raycastTarget = false;
         }
 
         private void AddFurnitureIcon(Transform cellParent, Sprite sprite, float cellSize)

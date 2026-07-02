@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Murdoku\MurdokuGameController.cs" />
     <Compile Include="Assets\Scripts\Murdoku\MurdokuClue.cs" />
+    <Compile Include="Assets\Scripts\Murdoku\MurdokuVisuals.cs" />
     <Compile Include="Assets\Scripts\Murdoku\MurdokuRuntimeUI.cs" />
     <Compile Include="Assets\Scripts\Murdoku\MobilePortraitSetup.cs" />
     <Compile Include="Assets\Scripts\Murdoku\MurdokuBootstrap.cs" />
